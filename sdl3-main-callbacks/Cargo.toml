@@ -1,0 +1,11 @@
+[package]
+name = "sdl3-main-callbacks"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+description = "Standalone application extracted from the customized SDL3 callbacks example."
+
+[dependencies]
+sdl3 = { version = "0.20.0", features = ["main", "build-from-source-static"] }
+sdl3-main = "0.7.0"
