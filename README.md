@@ -1,4 +1,4 @@
-# 2d-game-exeriments
+# 2d-game-experiments
 
 ## sdl3-main-callbacks
 
