@@ -13,6 +13,13 @@ use std::sync::Mutex;
 
 const LOGICAL_WINDOW_SIZE: (u32, u32) = (800, 600);
 
+fn window_size_for_scale(scale: f32) -> (u32, u32) {
+    (
+        (LOGICAL_WINDOW_SIZE.0 as f32 * scale).round().max(1.0) as u32,
+        (LOGICAL_WINDOW_SIZE.1 as f32 * scale).round().max(1.0) as u32,
+    )
+}
+
 struct App {
     main: MainThreadData<MainData>,
     mx: f32,
@@ -37,12 +44,17 @@ impl App {
 
         let sdl = sdl3::init()?;
         let video = sdl.video()?;
+        // Before a window exists, the display content scale converts logical
+        // dimensions to window units. Create it on the display we queried.
+        let initial_scale = video.get_primary_display()?.get_content_scale()?;
+        let initial_window_size = window_size_for_scale(initial_scale);
         let window = video
             .window(
                 "Hello callbacks api!",
-                LOGICAL_WINDOW_SIZE.0,
-                LOGICAL_WINDOW_SIZE.1,
+                initial_window_size.0,
+                initial_window_size.1,
             )
+            .position_centered()
             .high_pixel_density()
             .build()?;
         let canvas = create_renderer(window, None)?;
@@ -56,7 +68,7 @@ impl App {
             my: 0.0,
             last_repaint_mouse: None,
             needs_redraw: true,
-            requested_window_size: LOGICAL_WINDOW_SIZE,
+            requested_window_size: initial_window_size,
         })
     }
 
@@ -79,7 +91,8 @@ impl App {
         // SetWindowSize uses window units, not framebuffer pixels. Dividing by
         // pixel density avoids scaling twice on macOS/Wayland high-DPI windows.
         let window = canvas.window_mut();
-        let window_scale = window.display_scale() / window.pixel_density();
+        let display_scale = window.display_scale();
+        let window_scale = display_scale / window.pixel_density();
         if window_scale.is_finite()
             && window_scale > 0.0
             && !window.is_minimized()
@@ -88,14 +101,7 @@ impl App {
         {
             // Always derive from the logical size to avoid rounding drift when
             // moving back and forth between differently scaled monitors.
-            let size = (
-                (LOGICAL_WINDOW_SIZE.0 as f32 * window_scale)
-                    .round()
-                    .max(1.0) as u32,
-                (LOGICAL_WINDOW_SIZE.1 as f32 * window_scale)
-                    .round()
-                    .max(1.0) as u32,
-            );
+            let size = window_size_for_scale(window_scale);
             if size != self.requested_window_size {
                 if let Err(err) = window.set_size(size.0, size.1) {
                     eprintln!("Error updating window size for display scale: {err}");
@@ -111,7 +117,6 @@ impl App {
         // sdl3 0.20 does not expose SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED.
         // Check before the idle guard so monitor/settings changes redraw even
         // when the mouse is stationary or outside the window.
-        let display_scale = canvas.window().display_scale();
         if display_scale.is_finite()
             && display_scale > 0.0
             && canvas.scale() != (display_scale, display_scale)
@@ -163,7 +168,7 @@ impl App {
                 "Window size: {}x{} ({}x{} pixels)",
                 width, height, pixel_width, pixel_height
             ),
-            (4, 44),
+            (4, 48),
         );
         canvas.present();
         self.last_repaint_mouse = Some(mouse_position);

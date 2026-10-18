@@ -19,10 +19,13 @@ Because `sdl3` 0.20 does not expose SDL's display-scale-changed window event, ea
 callback checks the current scale before deciding whether a repaint is needed.
 Mouse coordinates remain in window units, including for the window bounds check.
 
-The window also scales its client area at startup and when the monitor scale
-changes: 800 x 600 pixels at 100%, 1200 x 900 at 150%, and 1600 x 1200 at 200%.
-The requested window size uses display scale divided by pixel density, so
-platforms that already use logical window coordinates are not scaled twice.
+Before creating the window, the application queries the primary display's
+content scale and calculates the initial client dimensions. It requests a
+centered position on that display so the initial size uses the matching scale.
+The client area scales to 800 x 600 pixels at 100%, 1200 x 900 at 150%, and
+1600 x 1200 at 200%, and continues to adapt when the monitor scale changes.
+After creation, the requested size uses window display scale divided by pixel
+density, so platforms that already use logical window coordinates are not scaled twice.
 Each size is derived from the original logical dimensions to avoid rounding
 drift. Resize requests are deferred while minimized, maximized, or fullscreen;
 the window manager may constrain the requested size to the available desktop.
