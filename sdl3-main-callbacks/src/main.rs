@@ -32,7 +32,7 @@ impl App {
 
         let sdl = sdl3::init()?;
         let video = sdl.video()?;
-        let canvas = video.window_and_renderer("Hello callbacks api!", 640, 480)?;
+        let canvas = video.window_and_renderer("Hello callbacks api!", 800, 600)?;
         Ok(Self {
             main: MainThreadData::assert_new(MainData {
                 canvas,
