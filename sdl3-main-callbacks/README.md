@@ -49,13 +49,15 @@ This replaces the original example command:
 cargo run --release --verbose --features "build-from-source-static,main" --example main-callbacks-api
 ```
 
-The project configures `LIBCLANG_PATH` in `.cargo/config.toml` to use
+The workspace configures `LIBCLANG_PATH` in the repository root's `.cargo/config.toml` to use
 `D:\bin\_compilers\_latests\clang-msvc\bin` for bindgen. Update that path when
 building on another computer, or override it with the environment variable.
 
 SDL3 is built from source and linked statically, so no separate SDL3 DLL is
 needed. The first build includes compiling SDL3. Dependencies come from
 crates.io; this project does not depend on the neighboring `sdl3-rs` checkout.
-Keep `Cargo.lock` in version control to retain the tested dependency versions.
+Keep the repository root's shared `Cargo.lock` in version control to retain
+the tested dependency versions. Build output goes to the root `target/` directory,
+and release settings are defined in the root `Cargo.toml`.
 
 The original MIT license is included in `LICENSE`.
