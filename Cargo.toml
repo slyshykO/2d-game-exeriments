@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "macroquad-sample",
     "raylib-sample",
     "sdl3-main-callbacks",
 ]

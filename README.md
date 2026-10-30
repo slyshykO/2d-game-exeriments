@@ -2,6 +2,7 @@
 
 Independent Rust game experiments in a Cargo workspace:
 
+- `macroquad-sample` — minimal Macroquad window, shapes, and mouse input (Rust 2024).
 - `raylib-sample` — raylib experiment (Rust 2024).
 - `sdl3-main-callbacks` — SDL3 callbacks experiment (Rust 2021).
 
@@ -27,7 +28,12 @@ Build or run a single experiment:
 cargo build -p raylib-sample --release --locked
 cargo run -p raylib-sample --release --locked
 cargo run -p sdl3-main-callbacks --release --locked
+cargo run -p macroquad-sample --release --locked
 ```
+
+The Macroquad sample draws a centered rectangle and an orange circle at the
+mouse position. Move the mouse to update the coordinates, resize the window,
+or press Escape to quit. No external assets are needed.
 
 All members share the root `Cargo.lock`, `target/` directory, and release
 profile. Each package keeps its own dependencies and Rust edition.
