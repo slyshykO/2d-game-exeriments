@@ -2,6 +2,7 @@
 
 Independent Rust game experiments in a Cargo workspace:
 
+- `bevy-sample` — minimal Bevy window, shapes, and mouse input (Rust 2024).
 - `macroquad-sample` — minimal Macroquad window, shapes, and mouse input (Rust 2024).
 - `raylib-sample` — raylib experiment (Rust 2024).
 - `sdl3-main-callbacks` — SDL3 callbacks experiment (Rust 2021).
@@ -11,6 +12,8 @@ Independent Rust game experiments in a Cargo workspace:
 Install Rust with edition 2024 support, CMake, and a C/C++ compiler. On
 Windows, use the MSVC Rust toolchain and Visual Studio Build Tools with
 Desktop development with C++.
+
+The Bevy sample requires Rust 1.97.1 or newer.
 
 The root `.cargo/config.toml` sets `LIBCLANG_PATH` for bindgen to
 `D:\bin\_compilers\_latests\clang-msvc\bin`. Update it for your computer,
@@ -29,9 +32,10 @@ cargo build -p raylib-sample --release --locked
 cargo run -p raylib-sample --release --locked
 cargo run -p sdl3-main-callbacks --release --locked
 cargo run -p macroquad-sample --release --locked
+cargo run -p bevy-sample --release --locked
 ```
 
-The Macroquad sample draws a centered rectangle and an orange circle at the
+The Macroquad and Bevy samples draw a centered rectangle and an orange circle at the
 mouse position. Move the mouse to update the coordinates, resize the window,
 or press Escape to quit. No external assets are needed.
 
