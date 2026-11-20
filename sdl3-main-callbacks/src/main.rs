@@ -3,7 +3,7 @@ use sdl3::{
     keyboard::Keycode,
     messagebox::{show_simple_message_box, MessageBoxFlag},
     pixels::Color,
-    render::{create_renderer, FRect, WindowCanvas},
+    render::{create_renderer, FPoint, FRect, Vertex, WindowCanvas},
     timer::ticks,
     video::FullscreenType,
     Sdl, VideoSubsystem,
@@ -12,6 +12,72 @@ use sdl3_main::{app_impl, AppResult, AppResultWithState, MainThreadData};
 use std::sync::Mutex;
 
 const LOGICAL_WINDOW_SIZE: (u32, u32) = (800, 600);
+
+/// Draws a filled circle in drawing units using the canvas's current color.
+#[allow(dead_code)] // Retained as an alternative to the arrow pointer.
+fn draw_circle(
+    canvas: &mut WindowCanvas,
+    center_x: f32,
+    center_y: f32,
+    radius: f32,
+) -> Result<(), sdl3::Error> {
+    if !radius.is_finite() || radius <= 0.0 {
+        return Ok(());
+    }
+
+    const SEGMENTS: usize = 64;
+    let center = Vertex {
+        position: FPoint::new(center_x, center_y),
+        color: canvas.draw_color().into(),
+        tex_coord: FPoint::new(0.0, 0.0),
+    };
+    let mut vertices = [center; SEGMENTS + 1];
+    let mut indices = [[0_u16; 3]; SEGMENTS];
+
+    for i in 0..SEGMENTS {
+        let angle = std::f32::consts::TAU * i as f32 / SEGMENTS as f32;
+        let (sin, cos) = angle.sin_cos();
+        vertices[i + 1].position = FPoint::new(center_x + radius * cos, center_y + radius * sin);
+        // Each triangle joins the center to two neighbors, wrapping at the end.
+        indices[i] = [0, (i + 1) as u16, ((i + 1) % SEGMENTS + 1) as u16];
+    }
+
+    canvas.render_geometry(&vertices, None, indices.as_slice())
+}
+
+/// Draws a filled arrow pointing up and left, with its tip at (tip_x, tip_y).
+/// `size` is its height in drawing units; the canvas supplies the color.
+fn draw_mouse_pointer(
+    canvas: &mut WindowCanvas,
+    tip_x: f32,
+    tip_y: f32,
+    size: f32,
+) -> Result<(), sdl3::Error> {
+    if !size.is_finite() || size <= 0.0 {
+        return Ok(());
+    }
+
+    let scale = size / 24.0;
+    let color = canvas.draw_color().into();
+    let vertices = [
+        (0.0, 0.0), // Tip / mouse hotspot.
+        (16.0, 13.0),
+        (9.0, 13.0),
+        (13.0, 22.0),
+        (9.0, 24.0),
+        (5.0, 15.0),
+        (0.0, 20.0),
+    ]
+    .map(|(x, y)| Vertex {
+        position: FPoint::new(tip_x + x * scale, tip_y + y * scale),
+        color,
+        tex_coord: FPoint::new(0.0, 0.0),
+    });
+    // Three triangles fill the arrowhead; two fill its inclined shaft.
+    let indices = [[0_u16, 1, 2], [0, 2, 5], [0, 5, 6], [2, 3, 4], [2, 4, 5]];
+
+    canvas.render_geometry(&vertices, None, indices.as_slice())
+}
 
 fn window_size_for_scale(scale: f32) -> (u32, u32) {
     (
@@ -40,7 +106,7 @@ impl App {
     fn new() -> Result<Self, Box<dyn ::core::error::Error>> {
         // Limit repaints to 25 per second by letting SDL pace app_iterate().
         // Some platforms ignore this hint; see SDL_HINT_MAIN_CALLBACK_RATE.
-        sdl3::hint::set("SDL_MAIN_CALLBACK_RATE", "25");
+        sdl3::hint::set("SDL_MAIN_CALLBACK_RATE", "60");
 
         let sdl = sdl3::init()?;
         let video = sdl.video()?;
@@ -170,6 +236,18 @@ impl App {
             ),
             (4, 48),
         );
+        canvas.set_draw_color(Color::YELLOW);
+        // Mouse events use window units; geometry uses scaled drawing units.
+        let pixel_density = canvas.window().pixel_density();
+        if let Err(err) = draw_mouse_pointer(
+            canvas,
+            self.mx * pixel_density / scale_x,
+            self.my * pixel_density / scale_y,
+            20.4,
+        ) {
+            eprintln!("Error drawing mouse pointer: {err}");
+        }
+
         canvas.present();
         self.last_repaint_mouse = Some(mouse_position);
         self.needs_redraw = false;

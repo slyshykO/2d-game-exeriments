@@ -1,19 +1,19 @@
 /*******************************************************************************************
-*
-*   raylib [core] example - highdpi demo
-*
-*   Example complexity rating: [★★☆☆] 2/4
-*
-*   Example originally created with raylib 5.0, last time updated with raylib 5.5
-*
-*   Example contributed by Jonathan Marler (@marler8997) and reviewed by Ramon Santamaria (@raysan5)
-*
-*   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2025 Jonathan Marler (@marler8997)
-*
-********************************************************************************************/
+ *
+ *   raylib [core] example - highdpi demo
+ *
+ *   Example complexity rating: [★★☆☆] 2/4
+ *
+ *   Example originally created with raylib 5.0, last time updated with raylib 5.5
+ *
+ *   Example contributed by Jonathan Marler (@marler8997) and reviewed by Ramon Santamaria (@raysan5)
+ *
+ *   Example licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+ *   BSD-like license that allows static linking with closed source software
+ *
+ *   Copyright (c) 2025 Jonathan Marler (@marler8997)
+ *
+ ********************************************************************************************/
 
 use raylib::prelude::*;
 
@@ -52,7 +52,7 @@ fn main() {
     let mut _cell_size_px = cell_size as f32;
 
     rl.set_target_fps(60); // Set our game to run at 60 frames-per-second
-    
+
     //--------------------------------------------------------------------------------------
 
     // Main game loop
@@ -233,4 +233,3 @@ fn draw_text_center<D: RaylibDraw>(
     let pos = Vector2::new(x as f32 - size.x / 2.0, y as f32 - size.y / 2.0);
     d.draw_text_ex(font, text, pos, font_size as f32, 3.0, color);
 }
-

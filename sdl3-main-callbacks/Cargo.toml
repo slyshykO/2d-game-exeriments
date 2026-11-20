@@ -7,7 +7,7 @@ license = "MIT"
 description = "Standalone application extracted from the customized SDL3 callbacks example."
 
 [dependencies]
-sdl3 = { version = "0.20.0", features = ["main", "build-from-source-static"] }
+sdl3 = { version = "0.22", features = ["main", "build-from-source-static"] }
 sdl3-main = "0.7.0"
 
 [build-dependencies]
